@@ -151,6 +151,11 @@ func GetDownloads(
 		ids = slices.Collect(kvDetails.Keys())
 	}
 
+	if len(ids) == 0 {
+		gda.EndWithResult("no ids specified, nothing to download")
+		return nil
+	}
+
 	if options.updateDetails {
 		if err = GetData(ids,
 			[]vangogh_integration.ProductType{vangogh_integration.Details},
