@@ -9,32 +9,26 @@ import (
 )
 
 const (
-	SearchNew                    = "New"
-	SearchOwned                  = "Own"
-	SearchWishlist               = "Wish"
-	SearchSale                   = "Sale"
-	SearchGogPreservationProgram = "GPP"
-	SearchMods                   = "Mods"
+	SearchNew      = "New"
+	SearchGog      = "GOG"
+	SearchWishlist = "Wish"
+	SearchSale     = "Sale"
 )
 
 var SearchScopesSymbols = map[string]compton.Symbol{
-	SearchNew:                    compton.TwoTitleValues,
-	SearchOwned:                  compton.CircleCompactDisk,
-	SearchWishlist:               compton.Heart,
-	SearchSale:                   compton.Percent,
-	SearchGogPreservationProgram: compton.Gemstone,
-	SearchMods:                   compton.PuzzlePiece,
+	SearchNew:      compton.TwoTitleValues,
+	SearchGog:      compton.LetterG,
+	SearchWishlist: compton.Heart,
+	SearchSale:     compton.Percent,
 }
 
 const GogPreservationProgramTag = "Good Old Game"
 
 var SearchOrder = []string{
 	SearchNew,
-	SearchOwned,
+	SearchGog,
 	SearchWishlist,
 	SearchSale,
-	SearchGogPreservationProgram,
-	SearchMods,
 }
 
 func SearchScopes() map[string]string {
@@ -48,7 +42,7 @@ func SearchScopes() map[string]string {
 	q.Set(vangogh_integration.ProductTypeProperty, vangogh_integration.GameProductType)
 	q.Set(vangogh_integration.SortProperty, vangogh_integration.GOGOrderDateProperty)
 	q.Set(vangogh_integration.DescendingProperty, vangogh_integration.TrueValue)
-	queries[SearchOwned] = q.Encode()
+	queries[SearchGog] = q.Encode()
 
 	q = make(url.Values)
 	q.Set(vangogh_integration.UserWishlistProperty, vangogh_integration.TrueValue)
@@ -64,13 +58,13 @@ func SearchScopes() map[string]string {
 	q.Set(vangogh_integration.DescendingProperty, vangogh_integration.TrueValue)
 	queries[SearchSale] = q.Encode()
 
-	q = make(url.Values)
-	q.Set(vangogh_integration.IsModProperty, vangogh_integration.TrueValue)
-	queries[SearchMods] = q.Encode()
-
-	q = make(url.Values)
-	q.Set(vangogh_integration.StoreTagsProperty, GogPreservationProgramTag)
-	queries[SearchGogPreservationProgram] = q.Encode()
+	//q = make(url.Values)
+	//q.Set(vangogh_integration.IsModProperty, vangogh_integration.TrueValue)
+	//queries[SearchMods] = q.Encode()
+	//
+	//q = make(url.Values)
+	//q.Set(vangogh_integration.StoreTagsProperty, GogPreservationProgramTag)
+	//queries[SearchGogPreservationProgram] = q.Encode()
 
 	return queries
 }

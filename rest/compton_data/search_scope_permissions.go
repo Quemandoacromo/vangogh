@@ -6,6 +6,6 @@ import (
 )
 
 var SearchScopePermissions = map[string]author.Permission{
-	SearchOwned:    perm.ReadOwned,
+	SearchGog:      perm.ReadOwned,
 	SearchWishlist: perm.ReadWishlist,
 }
