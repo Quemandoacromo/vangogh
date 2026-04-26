@@ -9,6 +9,7 @@ import (
 	"github.com/arelate/southern_light/vangogh_integration"
 	"github.com/boggydigital/kevlar"
 	"github.com/boggydigital/nod"
+	"github.com/boggydigital/redux"
 )
 
 func GetAvailableProducts(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +21,7 @@ func GetAvailableProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	availableProducts, err := getAvailableProducts()
+	availableProducts, err := getAvailableProducts(rdx)
 	if err != nil {
 		http.Error(w, nod.Error(err).Error(), http.StatusInternalServerError)
 		return
@@ -34,7 +35,7 @@ func GetAvailableProducts(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getAvailableProducts() ([]vangogh_integration.AvailableProduct, error) {
+func getAvailableProducts(rdx redux.Readable) ([]vangogh_integration.AvailableProduct, error) {
 
 	accountPagesDir, err := vangogh_integration.AbsProductTypeDir(vangogh_integration.AccountPage)
 	if err != nil {
@@ -61,6 +62,7 @@ func getAvailableProducts() ([]vangogh_integration.AvailableProduct, error) {
 			avp := vangogh_integration.AvailableProduct{
 				Id:    strconv.FormatInt(int64(ap.Id), 10),
 				Title: ap.Title,
+				Dlc:   make(map[string]string),
 			}
 
 			if ap.WorksOn.Windows {
@@ -73,6 +75,17 @@ func getAvailableProducts() ([]vangogh_integration.AvailableProduct, error) {
 
 			if ap.WorksOn.Linux {
 				avp.OperatingSystems = append(avp.OperatingSystems, vangogh_integration.Linux)
+			}
+
+			if isRequiredByGames, ok := rdx.GetAllValues(vangogh_integration.IsRequiredByGamesProperty, strconv.Itoa(ap.Id)); ok {
+				for _, rbgId := range isRequiredByGames {
+					if owned, sure := rdx.GetLastVal(vangogh_integration.OwnedProperty, rbgId); !sure || owned != vangogh_integration.TrueValue {
+						continue
+					}
+					if title, sure := rdx.GetLastVal(vangogh_integration.TitleProperty, rbgId); sure {
+						avp.Dlc[rbgId] = title
+					}
+				}
 			}
 
 			availableProducts = append(availableProducts, avp)
